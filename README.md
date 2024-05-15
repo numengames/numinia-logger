@@ -31,15 +31,19 @@ npm install @numengames/numinia-logger --save
 Here's how to integrate the logging module:
 
 1. Declare the middleware passing the config & the express object
+
 ```javascript
 const app = express();
 loggerMiddleware(config.logger, app);
 ```
+
 2. Initialize the logger method:
+
 ```javascript
 import { logger } from '@numengames/numinia-logger';
 logger('main-file');
 ```
+
 3. Use `logger.logInfo or logger.logError to properly log things`.
 
 ## Configuration

@@ -10,7 +10,11 @@ import { TLoggerConfig } from './types';
 const { combine, prettyPrint } = format;
 
 const ignoreMessageList = (ignoreList: Array<string>) =>
-  format(info => (ignoreList.some(item => JSON.stringify(info).includes(item)) ? false : info))();
+  format((info) =>
+    ignoreList.some((item) => JSON.stringify(info).includes(item))
+      ? false
+      : info,
+  )();
 
 export default ({ loki, discord }: TLoggerConfig, app: Application): void => {
   const transportList: TransportStream[] = [
@@ -72,11 +76,11 @@ export default ({ loki, discord }: TLoggerConfig, app: Application): void => {
   };
 
   function initLogger(req: Request, res: Response, next: NextFunction) {
-    console.log = args => logger.info.call(logger, args);
-    console.info = args => logger.info.call(logger, args);
-    console.warn = args => logger.warn.call(logger, args);
-    console.error = args => logger.error.call(logger, args);
-    console.debug = args => logger.debug.call(logger, args);
+    console.log = (args) => logger.info.call(logger, args);
+    console.info = (args) => logger.info.call(logger, args);
+    console.warn = (args) => logger.warn.call(logger, args);
+    console.error = (args) => logger.error.call(logger, args);
+    console.debug = (args) => logger.debug.call(logger, args);
 
     next();
   }
