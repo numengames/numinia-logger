@@ -75,7 +75,7 @@ export default ({ loki, discord }: TLoggerConfig, app: Application): void => {
     },
   };
 
-  function initLogger(req: Request, res: Response, next: NextFunction) {
+  function initLogger(_req: Request, _res: Response, next: NextFunction) {
     console.log = (args) => logger.info.call(logger, args);
     console.info = (args) => logger.info.call(logger, args);
     console.warn = (args) => logger.warn.call(logger, args);
