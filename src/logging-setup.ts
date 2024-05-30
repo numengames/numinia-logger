@@ -80,21 +80,24 @@ export const morganOptions: StreamOptions = {
   },
 };
 
-export const initLogger = (
-  _req: Request,
-  _res: Response,
-  next: NextFunction,
-) => {
+export const setupLogger = () => {
   console.log = (args) => logger.info.call(logger, args);
   console.info = (args) => logger.info.call(logger, args);
   console.warn = (args) => logger.warn.call(logger, args);
   console.error = (args) => logger.error.call(logger, args);
   console.debug = (args) => logger.debug.call(logger, args);
+};
 
+export const setupMiddleware = (
+  _req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  setupLogger();
   next();
 };
 
 export const setupExpressLogging = (app: Application) => {
   app.use(morgan('tiny', { stream: morganOptions }));
-  app.use(initLogger);
+  app.use(setupMiddleware);
 };
