@@ -7,6 +7,7 @@ const createLoggerHandler = (title: string): ILogger => {
   function logInfo(message: string, options?: Record<string, unknown>): void {
     if (environmentList.includes(process.env.NODE_ENV || '')) {
       console.info({
+        discord: false,
         ...options,
         message: `${title} - ${message}`,
         labels: options && options.labels ? { ...options.labels } : { message },
