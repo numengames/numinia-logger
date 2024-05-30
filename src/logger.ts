@@ -3,7 +3,7 @@ import { ILogger } from './interfaces';
 
 const environmentList = ['production', 'dev'];
 
-export default (title: string): ILogger => {
+const createLoggerHandler = (title: string): ILogger => {
   function logInfo(message: string, options?: Record<string, unknown>): void {
     if (environmentList.includes(process.env.NODE_ENV || '')) {
       console.info({
@@ -41,3 +41,5 @@ export default (title: string): ILogger => {
 
   return { logInfo, logError };
 };
+
+export default createLoggerHandler;

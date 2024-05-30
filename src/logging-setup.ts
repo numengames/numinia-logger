@@ -16,7 +16,9 @@ const ignoreMessageList = (ignoreList: Array<string>) =>
       : info,
   )();
 
-export default ({ loki, discord }: TLoggerConfig, app: Application): void => {
+let logger: Logger;
+
+export const initializeLogger = ({ loki, discord }: TLoggerConfig): Logger => {
   const transportList: TransportStream[] = [
     new transports.Console({
       silent: process.env.LOG !== '1',
@@ -59,32 +61,40 @@ export default ({ loki, discord }: TLoggerConfig, app: Application): void => {
     }
   }
 
-  const logger: Logger = createLogger({
+  logger = createLogger({
     exitOnError: false,
     transports: transportList,
     format: combine(format.errors({ stack: true })),
   });
 
-  const morganOptions: StreamOptions = {
-    write: function (message: string) {
-      logger.info.call(logger, {
-        discord: false,
-        message: message.trim(),
-        labels: { message: message.trim() },
-      });
-    },
-  };
+  return logger;
+};
 
-  function initLogger(_req: Request, _res: Response, next: NextFunction) {
-    console.log = (args) => logger.info.call(logger, args);
-    console.info = (args) => logger.info.call(logger, args);
-    console.warn = (args) => logger.warn.call(logger, args);
-    console.error = (args) => logger.error.call(logger, args);
-    console.debug = (args) => logger.debug.call(logger, args);
+export const morganOptions: StreamOptions = {
+  write: (message: string) => {
+    logger.info.call(logger, {
+      discord: false,
+      message: message.trim(),
+      labels: { message: message.trim() },
+    });
+  },
+};
 
-    next();
-  }
+export const initLogger = (
+  _req: Request,
+  _res: Response,
+  next: NextFunction,
+) => {
+  console.log = (args) => logger.info.call(logger, args);
+  console.info = (args) => logger.info.call(logger, args);
+  console.warn = (args) => logger.warn.call(logger, args);
+  console.error = (args) => logger.error.call(logger, args);
+  console.debug = (args) => logger.debug.call(logger, args);
 
+  next();
+};
+
+export const setupExpressLogging = (app: Application) => {
   app.use(morgan('tiny', { stream: morganOptions }));
   app.use(initLogger);
 };

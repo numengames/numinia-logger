@@ -1,6 +1,19 @@
+import {
+  initLogger,
+  morganOptions,
+  initializeLogger,
+  setupExpressLogging,
+} from './logging-setup';
 import * as types from './types';
-import loggerHandler from './logger';
+import createLoggerHandler from './logger';
 import * as interfaces from './interfaces';
-import loggerMiddleware from './middleware';
 
-export { types, interfaces, loggerHandler, loggerMiddleware };
+export {
+  types,
+  interfaces,
+  initLogger,
+  morganOptions,
+  initializeLogger,
+  createLoggerHandler,
+  setupExpressLogging,
+};
