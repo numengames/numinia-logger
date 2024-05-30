@@ -16,8 +16,6 @@ const ignoreMessageList = (ignoreList: Array<string>) =>
       : info,
   )();
 
-let logger: Logger;
-
 export const initializeLogger = ({ loki, discord }: TLoggerConfig): Logger => {
   const transportList: TransportStream[] = [
     new transports.Console({
@@ -61,26 +59,16 @@ export const initializeLogger = ({ loki, discord }: TLoggerConfig): Logger => {
     }
   }
 
-  logger = createLogger({
+  return createLogger({
     exitOnError: false,
     transports: transportList,
     format: combine(format.errors({ stack: true })),
   });
-
-  return logger;
 };
 
-export const morganOptions: StreamOptions = {
-  write: (message: string) => {
-    logger.info.call(logger, {
-      discord: false,
-      message: message.trim(),
-      labels: { message: message.trim() },
-    });
-  },
-};
+export const initLogger = (config: TLoggerConfig) => {
+  const logger = initializeLogger(config);
 
-export const setupLogger = () => {
   console.log = (args) => logger.info.call(logger, args);
   console.info = (args) => logger.info.call(logger, args);
   console.warn = (args) => logger.warn.call(logger, args);
@@ -89,15 +77,28 @@ export const setupLogger = () => {
 };
 
 export const setupMiddleware = (
+  config: TLoggerConfig,
   _req: Request,
   _res: Response,
   next: NextFunction,
 ) => {
-  setupLogger();
+  initLogger(config);
   next();
 };
 
-export const setupExpressLogging = (app: Application) => {
+export const initExpressLogger = (config: TLoggerConfig, app: Application) => {
+  const logger = initializeLogger(config);
+
+  const morganOptions: StreamOptions = {
+    write: (message: string) => {
+      logger.info.call(logger, {
+        discord: false,
+        message: message.trim(),
+        labels: { message: message.trim() },
+      });
+    },
+  };
+
   app.use(morgan('tiny', { stream: morganOptions }));
-  app.use(setupMiddleware);
+  app.use(setupMiddleware.bind(logger));
 };
