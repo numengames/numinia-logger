@@ -1,6 +1,6 @@
 {
   "name": "@numengames/numinia-logger",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "This module provides a unified and centralized logging solution across multiple projects. It facilitates integration with various logging systems and notification platforms, ensuring consistent and accessible log collection and visualization",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
