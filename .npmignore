@@ -1,4 +1,13 @@
 CHANGELOG
 node_modules
+src/
+.git
 .vscode
 .eslintrc.json
+.eslintignore
+.prettierignore
+.prettierrc
+.gitignore
+.npmignore
+tsconfig.json
+CHANGELOG
