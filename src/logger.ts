@@ -6,12 +6,15 @@ const environmentList = ['production', 'dev'];
 const createLoggerHandler = (title: string): ILogger => {
   function logInfo(message: string, options?: Record<string, unknown>): void {
     if (environmentList.includes(process.env.NODE_ENV || '')) {
-      console.info({
-        discord: false,
+      const logOptions = {
+        discord: options?.discord || false,
+        level: options?.level || 'info',
         ...options,
         message: `${title} - ${message}`,
         labels: options && options.labels ? { ...options.labels } : { message },
-      });
+      };
+
+      console.info(logOptions);
     }
   }
 
@@ -19,13 +22,15 @@ const createLoggerHandler = (title: string): ILogger => {
     if (environmentList.includes(process.env.NODE_ENV || '')) {
       if (!error) {
         console.error({
-          error: 'Unknown error',
+          error,
+          message: 'Unknown error',
           labels: { message },
         });
       } else if ('isBoom' in error && error.isBoom) {
         const boomError = error as Boom.Boom;
         console.error({
-          error: boomError.message,
+          error,
+          message: boomError.message,
           labels: {
             statusCode: boomError.output.statusCode,
             message: boomError.output.payload.message,
@@ -33,7 +38,8 @@ const createLoggerHandler = (title: string): ILogger => {
         });
       } else {
         console.error({
-          error: error.message || 'Unknown error',
+          error,
+          message: error.message || 'Unknown error',
           labels: { message },
         });
       }
