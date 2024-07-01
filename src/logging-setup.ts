@@ -9,6 +9,8 @@ import { TLoggerConfig } from './types';
 
 const { combine, prettyPrint } = format;
 
+const environmentList = ['production', 'dev'];
+
 const ignoreMessageList = (ignoreList: Array<string>) =>
   format((info) =>
     ignoreList.some((item) => JSON.stringify(info).includes(item))
@@ -33,7 +35,7 @@ export const initializeLogger = ({ loki, discord }: TLoggerConfig): Logger => {
     }),
   ];
 
-  if (process.env.NODE_ENV === 'production') {
+  if (environmentList.includes(process.env.NODE_ENV || '')) {
     transportList.push(
       new LokiTransport({
         format: combine(
@@ -52,8 +54,8 @@ export const initializeLogger = ({ loki, discord }: TLoggerConfig): Logger => {
       transportList.push(
         new DiscordTransport({
           level: 'info',
-          webhook: discord.webhook,
-          defaultMeta: { service: discord.service },
+          webhook: discord!.webhook,
+          defaultMeta: { service: discord!.service },
         }),
       );
     }
@@ -92,6 +94,7 @@ export const initExpressLogger = (config: TLoggerConfig, app: Application) => {
   const morganOptions: StreamOptions = {
     write: (message: string) => {
       logger.info.call(logger, {
+        discord: false,
         message: message.trim(),
         labels: { message: message.trim() },
       });
@@ -99,5 +102,8 @@ export const initExpressLogger = (config: TLoggerConfig, app: Application) => {
   };
 
   app.use(morgan('tiny', { stream: morganOptions }));
-  app.use(setupMiddleware.bind(logger));
+
+  app.use((req, res, next) => {
+    setupMiddleware(config, req, res, next);
+  });
 };
