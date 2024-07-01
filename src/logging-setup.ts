@@ -92,7 +92,6 @@ export const initExpressLogger = (config: TLoggerConfig, app: Application) => {
   const morganOptions: StreamOptions = {
     write: (message: string) => {
       logger.info.call(logger, {
-        discord: false,
         message: message.trim(),
         labels: { message: message.trim() },
       });
